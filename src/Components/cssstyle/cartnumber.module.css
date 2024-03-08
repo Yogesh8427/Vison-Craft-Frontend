@@ -1,0 +1,10 @@
+ .cartparent{
+    position: relative;
+ }
+ .cart{
+    width: 1.5vw;
+    text-align: center;
+    position:absolute;
+    top: 8px;
+    left:35px;
+}
