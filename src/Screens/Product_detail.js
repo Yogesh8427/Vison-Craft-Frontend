@@ -46,8 +46,8 @@ function ProductDetail() {
                     </select>
                     {data.availability === "false" ?
                         <button type="button" className="btn btn-outline-warning" disabled>Out of Stock</button> :
-                        product.some((item) => item.id === data.id) ?
-                            <button button type="button" className="btn btn-outline-danger"
+                        product.map((item) =>{if(item.id === data.id){return true}else{return false}}) ?
+                            <button type="button" className="btn btn-outline-danger"
                                 onClick={() => remove_item_cart(data)}>Remove To Cart</button> :
                             <button type="button" className="btn btn-outline-success"
                                 onClick={() => add_item_cart(data)}>Add To Cart</button>

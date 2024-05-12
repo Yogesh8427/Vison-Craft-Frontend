@@ -4,11 +4,13 @@ import axios from "axios";
 import { geturl } from "../../config/url";
 //add item to the cart
 export const add_to_cart = async (item) => {
+    const userid=localStorage.getItem('userid');
     const config = { headers: { authToken: localStorage.getItem('token') } }
     const newurl = geturl("/cart/cartdata");
-    const newitem={...item,isSlected:true,Quantity:1};
+    console.log(item);
+    const newitem={...item,isSlected:true,Quantity:1,actualQuantity:item.Quantity,userid};
     await axios.post(newurl, newitem, config);
-    store.dispatch(addItem({...item,isSlected:"true",Quantity:1,price:item.Price}));
+    store.dispatch(addItem({...item,isSlected:"true",Quantity:1,price:item.Price,actualQuantity:item.Quantity,userid}));
 }
 //remove item from the cart
 export const remove_to_cart = async (item) => {

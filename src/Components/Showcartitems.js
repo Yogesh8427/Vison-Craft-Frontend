@@ -1,11 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { remove_to_cart, update_to_cart } from '../Redux/actions/cartaction';
-
+import { alert } from '../Redux/actions/alertaction';
 function Showcartitems({ Products }) {
 
+    // console.log("Showcartitems", Products);
     const onincrease = () => {
-        Products = { ...Products, Quantity: Products.Quantity + 1 };
-        update_to_cart(Products)
+        if (Products.Quantity < Products.actualQuantity) {
+            Products = { ...Products, Quantity: Products.Quantity + 1 };
+            update_to_cart(Products)
+        }else{
+            alert("you  have reached the maximum quantity for this product", "danger");
+        }
     }
     const ondecrease = () => {
         if (Products.Quantity > 1) {
@@ -41,7 +46,7 @@ function Showcartitems({ Products }) {
                     >
                     </img>
                     <div className='w-100 d-flex flex-column align-items-center'>
-                        <p className='font-weight-bold'>Quantity</p>
+                        <span className='font-weight-bold'>Quantity</span>
                         <div>
                             <button type="button"
                                 className="btn btn-danger mx-2 my-2 font-weight-bold "
@@ -60,17 +65,17 @@ function Showcartitems({ Products }) {
                     <h3 className='text-center'>{Products.brand}</h3>
                     <div className='d-flex '>
                         <div className='w-100 d-flex flex-column justify-content-center align-items-center'>
-                            <p className='w-100'><b>Model: </b>{Products.model}</p>
-                            <p className='w-100'><b>Size: </b>{Products.size}</p>
+                            <span className='w-100'><b>Model: </b>{Products.model}</span>
+                            <span className='w-100'><b>Size: </b>{Products.size}</span>
                         </div>
                     </div>
-                    {Products.availability==="false"&&<div class="alert alert-warning my-1 p-1 text-center" role="alert">
-                    Currently Product is Not  Available
-                </div>}
+                    {Products.availability === "false" && <div className="alert alert-warning my-1 p-1 text-center" role="alert">
+                        Currently Product is Not  Available
+                    </div>}
                 </div>
                 <div className='px-2' style={{ 'width': '30%' }}>
-                    <p className='font-weight-bold'>Each Price: <p className='float-right'> ₹{Products.price} X {Products.Quantity}</p></p>
-                    <h3>Total: <h3 className='float-right' style={{ color: "#f56042" }}>₹{Products.price * Products.Quantity}</h3></h3>
+                    <span className='font-weight-bold'>Each Price: <span className='float-right'> ₹{Products.price} X {Products.Quantity}</span></span>
+                    <h3>Total: <span className='float-right' style={{ color: "#f56042" }}>₹{Products.price * Products.Quantity}</span></h3>
                     <button
                         type="button"
                         className="btn btn-danger w-100 my-3 float-right"

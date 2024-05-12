@@ -2,6 +2,7 @@ import React from 'react'
 import { geturl } from '../config/url'
 import axios from 'axios'
 import { alert } from '../Redux/actions/alertaction'
+import { Link } from 'react-router-dom'
 function AdminProductCard({ product }) {
     const sendrequest = async (product) => {
         const url = geturl("/admin/deleteitem");
@@ -13,14 +14,14 @@ function AdminProductCard({ product }) {
         }
     }
     const availableNow = async (data) => {
-            const url = geturl("/admin/availabeitem");
-            const config = { headers: { authToken: localStorage.getItem('token') } }
-            const result = await axios.post(url, { item_id: product.item_id, availability: `${data}` }, config);
-            if (result.data.status === 200) {
-                alert(result.data.message, "success");
-                window.location.reload();
-            }
-        
+        const url = geturl("/admin/availabeitem");
+        const config = { headers: { authToken: localStorage.getItem('token') } }
+        const result = await axios.post(url, { item_id: product.item_id, availability: `${data}` }, config);
+        if (result.data.status === 200) {
+            alert(result.data.message, "success");
+            window.location.reload();
+        }
+
     }
     return (
         <div>
@@ -41,10 +42,13 @@ function AdminProductCard({ product }) {
                     </div>
                 </div>
                 <div className='d-flex flex-column px-5' style={{ width: "33%" }}>
-                    <button type="button" className="btn btn-primary my-1 w-75">Edit Product</button>
+                    <Link type="button" className="btn btn-primary my-1 w-75"
+                    state={product} to="/adminadditem">Edit Product</Link>
                     {product.availability === "true"
-                        ? <button type="button" className="btn btn-success my-1 w-75" onClick={() => availableNow(false)}>Available Now</button>
-                        : <button type="button" className="btn btn-warning my-1 w-75" onClick={() => availableNow(true)}>Currently Not Available</button>
+                        ? <button type="button" className="btn btn-success my-1 w-75" onClick={() => availableNow(false)}>
+                            Available Now</button>
+                        : <button type="button" className="btn btn-warning my-1 w-75" onClick={() => availableNow(true)}>
+                            Currently Not Available</button>
                     }
                     <button
                         type="button"

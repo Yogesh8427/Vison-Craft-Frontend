@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 import Admin from './Screens/Admin';
 import AdminNavbar from './Components/AdminNavbar';
 import AdminProductDetails from './Screens/AdminProductDetails';
+import ThankyouScreen from './Screens/ThankyouScreen';
 function App() {
   const alert = useSelector(state => state.alertreduser);
   return (
@@ -35,6 +36,7 @@ function App() {
       <Route path='/kids' element={<Kids/>}/>
       <Route path='/adminadditem' element={<Admin/>}/>
       <Route path='/admin' element={<AdminProductDetails/>}/>
+      <Route path='/thankyou' element={<ThankyouScreen/>}/>
     </Routes>
     <Footer/>
     </BrowserRouter>

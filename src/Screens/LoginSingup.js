@@ -11,6 +11,7 @@ function LoginSingup() {
     if (localStorage.getItem("token")) {
       navigate("/");
     }
+    // eslint-disable-next-line
   }, [])
   const sendReq = async (e) => {
     e.preventDefault();
@@ -21,6 +22,7 @@ function LoginSingup() {
       localStorage.setItem("name", `${data.result[0].firstName + " " + data.result[0].lastName}`);
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', `${data.result[0].role}`);
+      localStorage.setItem('userid', `${data.result[0].userid}`);
       set_data_to_cart().then(() => {
         alert(data.message, "success");
         if (data.result[0].role === 'user') {
