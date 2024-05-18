@@ -1,23 +1,31 @@
 import { React, useEffect } from 'react'
 import effect from './cssstyle/effects.module.css'
 import cartnumber from './cssstyle/cartnumber.module.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useSelector } from 'react-redux';
 import { alert } from '../Redux/actions/alertaction';
 import { empty_cart } from '../Redux/actions/cartaction';
 import { set_data_to_cart } from '../Redux/actions/cartaction';
+import { empty_order } from '../Redux/actions/orderaction';
+import { getUserAddress,emptyuser} from '../Redux/actions/useraction';
 function Navbar() {
     const cartdata = useSelector((state) => state.cartreducer);
+    const navigate=useNavigate();
     useEffect(() => {
-        if (localStorage.getItem('token'))
+        if (localStorage.getItem('token')){
             set_data_to_cart();
+            getUserAddress();
+        }
     }, [])
     const logout = () => {
         alert("logout succesfully", "success");
         empty_cart();
+        empty_order();
+        emptyuser();
         localStorage.removeItem('token');
         localStorage.removeItem('role');
+        navigate("/");
     }
 
     return (
@@ -61,13 +69,15 @@ function Navbar() {
                                     <button type="button" className="btn my-2 my-sm-0 w-100" data-toggle="modal" data-target="#staticBackdrop">
                                         logout
                                     </button>
+                                    <Link to="/orders" className="btn my-2 my-sm-0 w-100">Your Orders</Link>
                                 </div>
                             </div>
 
                         }
                         <Link to={"/cartScreen"} className={`nav-link ${effect.image} ${cartnumber.cartparent}`}>
                             <i className="bi bi-cart2" style={{ fontSize: "xx-large" }}></i>
-                            <span className={`bg-danger text-white rounded-circle ${cartnumber.cart}`}>{cartdata.length}</span>
+                            {cartdata.length>0 &&
+                            <span className={`bg-danger text-white rounded-circle ${cartnumber.cart}`}>{cartdata.length}</span>}
                         </Link>
                     </form>
                 </div>

@@ -32,7 +32,7 @@ export const empty_cart = () => {
     store.dispatch(emptyCart());
 }
 
-//set database cart datat to redux
+//set database cart data to redux
 export const set_data_to_cart = async () => {
     const config = { headers: { authToken: localStorage.getItem('token') } }
     const newurl = geturl("/cart/usercartdata");

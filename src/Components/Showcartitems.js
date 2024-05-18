@@ -96,7 +96,7 @@ function Showcartitems({ Products }) {
             >
                 <div className="modal-dialog">
                     <div className="modal-content">
-                        <div className="modal-header">
+                        <div className="modal-header boder-0">
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -104,7 +104,7 @@ function Showcartitems({ Products }) {
                         <div className="modal-body text-center">
                             <h4>Do You Really Want To Remove This Item!!!</h4>
                         </div>
-                        <div className="modal-footer">
+                        <div className="modal-footer border-0">
                             <button type="button" className="btn btn-secondary" data-dismiss="modal">No</button>
                             <button onClick={() => removeItemFromCart(Products)} type="button"
                                 className="btn btn-primary"

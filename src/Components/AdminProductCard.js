@@ -14,14 +14,18 @@ function AdminProductCard({ product }) {
         }
     }
     const availableNow = async (data) => {
-        const url = geturl("/admin/availabeitem");
-        const config = { headers: { authToken: localStorage.getItem('token') } }
-        const result = await axios.post(url, { item_id: product.item_id, availability: `${data}` }, config);
-        if (result.data.status === 200) {
-            alert(result.data.message, "success");
-            window.location.reload();
+        try {
+            if(product.Quantity===0)return alert("Cannot make is available please increase the quantity of product","danger");
+            const url = geturl("/admin/availabeitem");
+            const config = { headers: { authToken: localStorage.getItem('token') } }
+            const result = await axios.post(url, { item_id: product.item_id, availability: `${data}` }, config);
+            if (result.data.status === 200) {
+                alert(result.data.message, "success");
+                window.location.reload();
+            }
+        } catch (error) {
+            alert("Server Error", "Danger");
         }
-
     }
     return (
         <div>
@@ -43,11 +47,12 @@ function AdminProductCard({ product }) {
                 </div>
                 <div className='d-flex flex-column px-5' style={{ width: "33%" }}>
                     <Link type="button" className="btn btn-primary my-1 w-75"
-                    state={product} to="/adminadditem">Edit Product</Link>
+                        state={product} to="/adminadditem">Edit Product</Link>
                     {product.availability === "true"
                         ? <button type="button" className="btn btn-success my-1 w-75" onClick={() => availableNow(false)}>
                             Available Now</button>
-                        : <button type="button" className="btn btn-warning my-1 w-75" onClick={() => availableNow(true)}>
+                        : <button type="button" className="btn btn-warning my-1 w-75"
+                            onClick={() => availableNow(true)}>
                             Currently Not Available</button>
                     }
                     <button

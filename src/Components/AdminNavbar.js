@@ -2,8 +2,9 @@ import { React } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { alert } from '../Redux/actions/alertaction';
+import effect from './cssstyle/effects.module.css'
 function AdminNavbar() {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const logout = () => {
         alert("logout succesfully", "success");
         localStorage.removeItem('token');
@@ -21,38 +22,32 @@ function AdminNavbar() {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
-                        {/* <li className="nav-item">
-                            <Link className={`nav-link ${effect.image}`} to="/mens">Men's</Link>
-                        </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${effect.image}`} to="/womens">Women's</Link>
+                            <Link className={`nav-link ${effect.image}`} to="/adminorders">Orders</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${effect.image}`} to="/kids">Kid's</Link>
-                        </li> */}
                     </ul>
                     <form className="form-inline my-2 my-lg-0">
                         {(!localStorage.getItem('token'))
                             ? <Link to={'/login'} className="btn btn-outline-dark my-2 my-sm-0">Login</Link>
                             : <div className="dropdown show">
-                            <Link className="btn  dropdown-toggle"
-                                to="/admin" role="button"
-                                id="dropdownMenuLink"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false">
-                                    <img src='https://static.vecteezy.com/system/resources/previews/019/879/198/non_2x/user-icon-on-transparent-background-free-png.png' 
-                                      alt='user'
-                                    width={"50px"}/>
-                                {localStorage.getItem("name")}
-                            </Link>
+                                <Link className="btn  dropdown-toggle"
+                                    to="/admin" role="button"
+                                    id="dropdownMenuLink"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                    <img src='https://static.vecteezy.com/system/resources/previews/019/879/198/non_2x/user-icon-on-transparent-background-free-png.png'
+                                        alt='user'
+                                        width={"50px"} />
+                                    {localStorage.getItem("name")}
+                                </Link>
 
-                            <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <button type="button" className="btn my-2 my-sm-0 w-100" data-toggle="modal" data-target="#staticBackdrop">
-                                    logout
-                                </button>
+                                <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <button type="button" className="btn my-2 my-sm-0 w-100" data-toggle="modal" data-target="#staticBackdrop">
+                                        logout
+                                    </button>
+                                </div>
                             </div>
-                        </div>
 
                         }
                     </form>

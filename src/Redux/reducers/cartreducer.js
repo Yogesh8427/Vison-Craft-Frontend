@@ -8,7 +8,6 @@ const cart=createSlice({
             return state;
         },
         removeItem:(state,action)=>{
-            console.log(action.payload);
             state=state.filter((value) => value.item_id!==action.payload.item_id);
             return state;
         },

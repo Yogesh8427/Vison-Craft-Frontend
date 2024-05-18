@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { alert } from "../Redux/actions/alertaction.js"
 import axios from 'axios'
 import { set_data_to_cart } from '../Redux/actions/cartaction.js'
+import { getUserAddress} from '../Redux/actions/useraction.js'
 function LoginSingup() {
   const [login, setlogin] = useState({ useremail: "", userpassword: "" })
   const navigate = useNavigate();
@@ -23,14 +24,16 @@ function LoginSingup() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', `${data.result[0].role}`);
       localStorage.setItem('userid', `${data.result[0].userid}`);
-      set_data_to_cart().then(() => {
-        alert(data.message, "success");
-        if (data.result[0].role === 'user') {
-          navigate("/");
-        }
-        else {
-          navigate('/admin');
-        }
+      getUserAddress().then(() => {
+        set_data_to_cart().then(() => {
+          alert(data.message, "success");
+          if (data.result[0].role === 'user') {
+            navigate("/");
+          }
+          else {
+            navigate('/admin');
+          }
+        })
       })
     } else if (data.status === 400) {
       alert(data.error, "danger");
@@ -50,7 +53,7 @@ function LoginSingup() {
       <div className='w-50 px-5 bg-light'>
         <h2 className='text-center my-5'>Login/<Link to={"/singup"}>Signup</Link></h2>
         <form onSubmit={sendReq}>
-          <div  className='d-flex flex-column justify-content-center px-4 '>
+          <div className='d-flex flex-column justify-content-center px-4 '>
             <div className="form-group">
               <label htmlFor="exampleInputEmail1" className='font-weight-bold '>Email address</label>
               <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"

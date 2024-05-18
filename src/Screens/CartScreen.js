@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from 'react'
 import Showcartitems from '../Components/Showcartitems'
 import { useSelector } from 'react-redux';
-import { setUserAddress, getUserAddress } from '../Redux/actions/useraction';
+import { setUserAddress } from '../Redux/actions/useraction';
 import axios from 'axios';
 import { geturl } from '../config/url';
 import { useNavigate } from 'react-router-dom';
@@ -10,9 +10,9 @@ import { remove_to_cart } from '../Redux/actions/cartaction';
 function CartScreen() {
     const Products = useSelector((state) => state.cartreducer);
     const user = useSelector((state) => state.userdetails)
-    const navigate=useNavigate();
-    const [address, setAddress] = useState({ address: "", pincode: "" });
-    const [paymentType,setPaymenttype]=useState(null);
+    const navigate = useNavigate();
+    const [address, setAddress] = useState({ address: null, pincode: null });
+    const [paymentType, setPaymenttype] = useState(null);
     let totalsum = 0;
     const getsum = (total, sum) => {
         if (sum.isSlected === "true")
@@ -38,14 +38,14 @@ function CartScreen() {
             "https://checkout.razorpay.com/v1/checkout.js"
         );
         if (!res) {
-            alert("Razorpay SDK failed to load. Are you online?","Danger");
+            alert("Razorpay SDK failed to load. Are you online?", "danger");
             return;
         }
         // creating a new order
         const url1 = geturl("/payment/orders")
         const result = await axios.post(url1, { amount: sum + 50 });
         if (!result) {
-            alert("Server error. Are you online?","Danger");
+            alert("Server error. Are you online?", "danger");
             return;
         }
         // Getting the order details back
@@ -67,9 +67,16 @@ function CartScreen() {
                 };
                 const selectedProducts = Products.filter((item) => item?.isSlected === "true");
                 const url2 = geturl('/payment/success')
-                const result = await axios.post(url2, { data, products: selectedProducts, user });
-                Products.map(item=>remove_to_cart(item))
-                result.data.msg?navigate("/thankyou",{state:result.data}):alert('Something went wrong!','Error');
+                const result = await axios.post(url2,
+                    {
+                        data,
+                        products: selectedProducts,
+                        userid: user.userid,
+                        admin_id: selectedProducts[0].admin_id,
+                        address: `${address.address} Pincode:${address.pincode}`
+                    });
+                result.data.msg === "success" && selectedProducts.map(item => remove_to_cart(item))
+                result.data.msg ? navigate("/thankyou", { state: result.data }) : alert('Something went wrong!', 'warning');
             },
             prefill: {
                 name: `${user.firstName} ${user.lastName}`,
@@ -87,12 +94,12 @@ function CartScreen() {
         paymentObject.open();
     }
     const getdata = async () => {
-        const data = await getUserAddress();
-        setAddress({ address: data.address, pincode: data.pincode })
+        setAddress({ address: user?.address, pincode: user?.pincode })
     }
     useEffect(() => {
         getdata();
-    }, [])
+        // eslint-disable-next-line
+    })
     // console.log("CartScreen",address); //
     const selectedItems = (total, sum) => {
         if (sum.isSlected === "true")
@@ -103,11 +110,28 @@ function CartScreen() {
     const handleChange = (e) => {
         setAddress({ ...address, [e.target.name]: [e.target.value] })
     }
-    const paymentOption=(e)=>{
+    const paymentOption = (e) => {
         setPaymenttype(e.currentTarget.value);
     }
-    const payment=()=>{
-        paymentType==="COD"?alert("hello Cod"):displayRazorpay();
+    const cod = async () => {
+        try {
+            const newurl = geturl("/payment/cod");
+            const selectedProducts = Products.filter((item) => item?.isSlected === "true");
+            const result = await axios.post(newurl,
+                {
+                    products: selectedProducts,
+                    userid: user.userid,
+                    admin_id: selectedProducts[0].admin_id,
+                    address:`${address.address} Pincode:${address.pincode}`
+                });
+            result.data.msg === "success" && selectedProducts.map(item => remove_to_cart(item));
+            result.data.msg ? navigate("/thankyou", { state: result.data }) : alert('Something went wrong!', 'warning');
+        } catch (error) {
+            alert("Server error", "danger");
+        }
+    }
+    const payment = () => {
+        paymentType === "COD" ? cod() : displayRazorpay();
     }
     return (
         <>
@@ -138,15 +162,15 @@ function CartScreen() {
                                         <button className="btn btn-outline-success w-100 my-4 "
                                             // onClick={displayRazorpay}
                                             data-toggle="modal" data-target="#exampleModal2"
-                                            disabled={sum === 0 ? true : false}>Checkout</button>
+                                            disabled={(sum === 0 || !address.address || !address.pincode) ? true : false}>Checkout</button>
                                     </div>
                                     <button type="button" className="btn btn-info float-right p-1 " data-toggle="modal" data-target="#exampleModal1">
-                                        {user ? "Change address" : "Add Address"}</button>
-                                    <div className='p-2' style={{ width: "17vw" }}>
+                                        {user?.address ? "Change address" : "Add Address"}</button>
+                                    {user?.address && <div className='p-2' style={{ width: "17vw" }}>
                                         <h5>Your Address</h5>
                                         <span style={{ wordWrap: "break-word" }}>{user?.address}</span>
                                         <h5>Pincode: {user?.pincode}</h5>
-                                    </div>
+                                    </div>}
                                 </div>
                                 }
                             </div>
@@ -189,23 +213,23 @@ function CartScreen() {
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header border-0">
-                            <h5 className="modal-title" id="exampleModalLabel">Place Order</h5>
+                            <h5 className="modal-title" id="exampleModalLabel">Total Pay : ₹{sum + 50}</h5>
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div className="modal-body">
-                        <input type="radio" className='m-2' aria-label="Cash on delivery" name='payment' 
-                        value={"COD"} onChange={(e)=>paymentOption(e)}/>
-                        <span>Cash on Delivery</span><br />
-                        <input type="radio" className='mx-2' aria-label="Razorpay" name='payment' 
-                        value={"Online"} onChange={(e)=>paymentOption(e)} />
-                        <span>Razorpay</span>
+                            <input type="radio" className='m-2' aria-label="Cash on delivery" name='payment'
+                                value={"COD"} onChange={(e) => paymentOption(e)} />
+                            <span>Cash on Delivery</span><br />
+                            <input type="radio" className='mx-2' aria-label="Razorpay" name='payment'
+                                value={"Online"} onChange={(e) => paymentOption(e)} />
+                            <span>Razorpay</span>
                         </div>
                         <div className="modal-footer border-0">
                             {/* <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button> */}
-                            <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={payment}>
-                            Place Order</button>
+                            {paymentType && <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={payment}>
+                                Place Order</button>}
                         </div>
                     </div>
                 </div>

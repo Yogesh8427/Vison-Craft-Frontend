@@ -38,15 +38,15 @@ function ProductDetail() {
                     <h3>{data.brand}</h3>
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat placeat similique dicta nulla praesentium deserunt.
                         Corporis repellendus deleniti dolores eligendi.</p>
-                    <p>Frame size</p>
-                    <select className='w-100 mb-4 p-2 border rounded' onChange={set_size}>
+                    <p>Frame size <b>{data.size}mm</b></p>
+                    {/* <select className='w-100 mb-4 p-2 border rounded' onChange={set_size}>
                         <option >48</option>
                         <option >42</option>
                         <option >52</option>
-                    </select>
+                    </select> */}
                     {data.availability === "false" ?
                         <button type="button" className="btn btn-outline-warning" disabled>Out of Stock</button> :
-                        product.map((item) =>{if(item.id === data.id){return true}else{return false}}) ?
+                        product.some((item) =>item.item_id === data.item_id) ?
                             <button type="button" className="btn btn-outline-danger"
                                 onClick={() => remove_item_cart(data)}>Remove To Cart</button> :
                             <button type="button" className="btn btn-outline-success"

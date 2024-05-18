@@ -1,7 +1,7 @@
 import store from "../store";
-import { setUser } from "../reducers/userdetails";
+import { setUser,emptyUserdetails} from "../reducers/userdetails";
 import axios from "axios";
-import { geturl } from "../../config/url";
+import { geturl} from "../../config/url";
 import { alert } from "./alertaction";
 
 export const setUserAddress=async(data)=>{
@@ -29,4 +29,7 @@ export const getUserAddress=async()=>{
         console.log(error);
         alert("Server error","danger");
     }
+}
+export const emptyuser=()=>{
+   store.dispatch(emptyUserdetails());
 }

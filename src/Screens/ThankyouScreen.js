@@ -14,7 +14,7 @@ function ThankyouScreen() {
             <h2 className='text-success'>Order Placed Successfully</h2>
             <i className='font-weight-bold'>"Thank You For Buying From Us"</i>
             <span>Order id : <b>{data?.orderId}</b></span>
-            <span>Payment id : <b>{data?.paymentId}</b></span>
+            {data?.paymentId && <span>Payment id : <b>{data?.paymentId}</b></span>}
 
         </div>
     )
