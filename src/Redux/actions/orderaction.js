@@ -25,7 +25,7 @@ export const update_order = async(item,cancleReason) => {
     try {
         const config = { headers: { authToken: localStorage.getItem('token') } }
         const newurl = geturl("/orders/cancleorder");
-        await axios.post(newurl,{item_id:item.item_id,order_id:item.order_id,cancleReason},config).then((res) => {
+        await axios.post(newurl,{order_id:item.order_id,cancleReason},config).then((res) => {
             if (res.data.status === 200) {
                 store.dispatch(updateOrders(item));
             } else {
