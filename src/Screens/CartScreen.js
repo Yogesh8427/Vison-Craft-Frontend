@@ -1,18 +1,19 @@
-import { React, useEffect, useState } from 'react'
+import { React, useEffect, useRef, useState } from 'react'
 import Showcartitems from '../Components/Showcartitems'
 import { useSelector } from 'react-redux';
 import { setUserAddress } from '../Redux/actions/useraction';
 import axios from 'axios';
 import { geturl } from '../config/url';
-import { useNavigate } from 'react-router-dom';
 import { alert } from '../Redux/actions/alertaction';
 import { remove_to_cart } from '../Redux/actions/cartaction';
 function CartScreen() {
     const Products = useSelector((state) => state.cartreducer);
     const user = useSelector((state) => state.userdetails)
-    const navigate = useNavigate();
+    const thankyoumodal=useRef(null);
+    const [data,setdata]=useState(null);
     const [address, setAddress] = useState({ address: null, pincode: null });
     const [paymentType, setPaymenttype] = useState(null);
+    const [loder, setloder] = useState(false);
     let totalsum = 0;
     const getsum = (total, sum) => {
         if (sum.isSlected === "true")
@@ -20,6 +21,9 @@ function CartScreen() {
         return totalsum;
     }
     let sum = Products.reduce(getsum, 0);
+    const hitThankyou=()=>{
+        thankyoumodal.current.click();
+    }
     function loadScript(src) {
         return new Promise((resolve) => {
             const script = document.createElement("script");
@@ -34,6 +38,7 @@ function CartScreen() {
         });
     }
     async function displayRazorpay() {
+        setloder(true);
         const res = await loadScript(
             "https://checkout.razorpay.com/v1/checkout.js"
         );
@@ -48,6 +53,7 @@ function CartScreen() {
             alert("Server error. Are you online?", "danger");
             return;
         }
+        setloder(false);
         // Getting the order details back
         const { amount, id: order_id, currency } = result.data;
         const options = {
@@ -76,7 +82,8 @@ function CartScreen() {
                         address: `${address.address} Pincode:${address.pincode}`
                     });
                 result.data.msg === "success" && selectedProducts.map(item => remove_to_cart(item))
-                result.data.msg ? navigate("/thankyou", { state: result.data }) : alert('Something went wrong!', 'warning');
+                setdata(result.data);
+                result.data.msg ?hitThankyou() : alert('Something went wrong!', 'warning');
             },
             prefill: {
                 name: `${user.firstName} ${user.lastName}`,
@@ -99,7 +106,7 @@ function CartScreen() {
     useEffect(() => {
         getdata();
         // eslint-disable-next-line
-    })
+    },[])
     // console.log("CartScreen",address); //
     const selectedItems = (total, sum) => {
         if (sum.isSlected === "true")
@@ -108,6 +115,8 @@ function CartScreen() {
     }
     let selected = Products.reduce(selectedItems, 0);
     const handleChange = (e) => {
+        if(address?.address!=null||address?.pincode!=null){
+        setAddress({ ...address, [e.target.name]: [e.target.value] })}
         setAddress({ ...address, [e.target.name]: [e.target.value] })
     }
     const paymentOption = (e) => {
@@ -122,10 +131,11 @@ function CartScreen() {
                     products: selectedProducts,
                     userid: user.userid,
                     admin_id: selectedProducts[0].admin_id,
-                    address:`${address.address} Pincode:${address.pincode}`
+                    address: `${address.address} Pincode:${address.pincode}`
                 });
             result.data.msg === "success" && selectedProducts.map(item => remove_to_cart(item));
-            result.data.msg ? navigate("/thankyou", { state: result.data }) : alert('Something went wrong!', 'warning');
+            setdata(result.data);
+            result.data.msg ? hitThankyou() : alert('Something went wrong!', 'warning');
         } catch (error) {
             alert("Server error", "danger");
         }
@@ -135,6 +145,10 @@ function CartScreen() {
     }
     return (
         <>
+            {loder && <div className='d-flex justify-content-center align-item-center position-absolute'
+                style={{ top: "45%", left: "48%" }}>
+                <img src="https://cdn.pixabay.com/animation/2023/11/30/10/11/10-11-02-622_512.gif" alt="" width={"100px"} />
+            </div>}
             <div className='container-sm bg-body shadow-lg p-3 my-4'>
                 <div className='d-flex justify-content-center'>
                     <img src="https://cdn.iconscout.com/icon/free/png-256/free-shopping-bag-1970453-1669843.png"
@@ -162,7 +176,7 @@ function CartScreen() {
                                         <button className="btn btn-outline-success w-100 my-4 "
                                             // onClick={displayRazorpay}
                                             data-toggle="modal" data-target="#exampleModal2"
-                                            disabled={(sum === 0 || !address.address || !address.pincode) ? true : false}>Checkout</button>
+                                            disabled={(sum === 0 || address.address===null || address.pincode===null) ? true : false}>Checkout</button>
                                     </div>
                                     <button type="button" className="btn btn-info float-right p-1 " data-toggle="modal" data-target="#exampleModal1">
                                         {user?.address ? "Change address" : "Add Address"}</button>
@@ -230,6 +244,38 @@ function CartScreen() {
                             {/* <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button> */}
                             {paymentType && <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={payment}>
                                 Place Order</button>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* <!-- Button trigger modal --> */}
+            <button type="button" ref={thankyoumodal} className="btn btn-primary" data-toggle="modal" data-target="#thankyou"  hidden>
+                Launch demo modal
+            </button>
+
+            {/* <!-- payment Success Modal --> */}
+            <div className="modal fade" id="thankyou" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header border-0">
+                            {/* <h5 className="modal-title" id="exampleModalLabel">Modal title</h5> */}
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className='container-sm  rounded p-5 d-flex flex-column justify-content-center align-items-center'>
+                                <div className='rounded-circle overflow-hidden'>
+                                    <img src="https://i.pinimg.com/originals/4a/10/e3/4a10e39ee8325a06daf00881ac321b2f.gif"
+                                        alt='success' width={"200px"} />
+                                </div>
+                                <h3 className='text-success text-center'>Order Placed Successfully</h3>
+                                <i className='font-weight-bold'>"Thank You For Buying From Us"</i>
+                                <span>Order id : <b>{data?.orderId}</b></span>
+                                {data?.paymentId && <span>Payment id : <b>{data?.paymentId}</b></span>}
+                            </div>
+                        </div>
+                        <div className="modal-footer border-0">
                         </div>
                     </div>
                 </div>

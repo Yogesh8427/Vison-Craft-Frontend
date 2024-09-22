@@ -9,7 +9,7 @@ import { update_order } from '../Redux/actions/orderaction'
 function OrdersScreen() {
     const orders = useSelector(state => state.ordersReduser);
     const [items, setItems] = useState([]);
-    const[total,setTotal]=useState(0);
+    const [total, setTotal] = useState(0);
     const [cancleReason, setcancleReason] = useState(null);
     const handlechange = (e) => {
         setcancleReason(() => e.target.value);
@@ -23,12 +23,12 @@ function OrdersScreen() {
             const url = geturl("/orders/getbuyproducts");
             await axios.post(url, { order_id }, config).then((response) => {
                 setItems(response.data);
-                let totalsum=0;
+                let totalsum = 0;
                 const getsum = (total, sum) => {
-                        totalsum = total + parseInt(sum.Price) * parseInt(sum.Quantity);
+                    totalsum = total + parseInt(sum.Price) * parseInt(sum.Quantity);
                     return totalsum;
                 }
-                setTotal( response.data.reduce(getsum, 0));
+                setTotal(response.data.reduce(getsum, 0));
             })
         } catch (error) {
             console.log("there is error to feching the data from server");
@@ -37,8 +37,8 @@ function OrdersScreen() {
     }
     return (
         <>
-            <div className='container shadow-lg rounded p-2 my-4'>
-                <div className='container boder my-3 '>
+            <div className='mx-5 rounded p-2 my-4'>
+                <div className='boder my-3 '>
                     <h4 className='text-center'>Your Orders</h4>
                     <table className="table">
                         <thead>
@@ -51,31 +51,38 @@ function OrdersScreen() {
                                 <th>Total Items</th>
                                 <th>Payment Mode</th>
                                 <th>Address</th>
-                                <th>Actions</th>
+                                <th>Cancle Reason</th>
+                                <th className='text-center' colSpan={2}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {orders.map((item, index) =>
-                                <tr>
+                                <tr key={index}>
                                     <th scope="row">{index + 1}</th>
                                     <th className='text-primary'>{item?.order_id}</th>
                                     <th className='text-primary'>{!item?.payment_id ? "None" : item?.payment_id}</th>
                                     <td>{item?.payment_status}</td>
-                                    <th className={`text-${item?.order_status === "Cancled" ? "danger" : "success"}`}>{item?.order_status}</th>
+                                    <th className={`text-${item?.order_status === "Cancelled" ? "danger" : "success"}`}>{item?.order_status}</th>
                                     <td>{item?.Quantity}</td>
                                     <td>{item?.payment_mode}</td>
                                     <td>{item?.address}</td>
+                                    <td>
+                                        {item?.cancleReason && <div className="alert alert-danger" role="alert">
+                                            ! {item?.cancleReason}
+                                        </div>}
+                                        </td>
                                     <td>
                                         <button type="button"
                                             className="btn btn-primary rounded-pill w-100 "
                                             onClick={() => getitems(item.order_id)}
                                             data-toggle="modal" data-target={`#exampleModal${index}`}
                                         >View</button>
-                                        <button type="button"
+                                    </td><td>
+                                        {item?.order_status === "Processing" && <button type="button"
                                             className="btn btn-warning w-100 rounded-pill m-1"
                                             data-toggle="modal" data-target={`#exampleModal${item.order_id}`}
-                                            disabled={item.order_status === "Cancled" ? true : false}
-                                        >Cancle</button>
+                                            disabled={item.order_status === "Cancelled" ? true : false}
+                                        >Cancle</button>}
                                     </td>
                                     <td>
                                         {/* <!-- view Modal --> */}
@@ -97,14 +104,14 @@ function OrdersScreen() {
                                                         </button>
                                                     </div>
                                                     <div className="modal-body">
-                                                        {items?.map((item,index) =>
+                                                        {items?.map((item, index) =>
                                                             <Ordercards product={item} key={index} />)}
                                                         <hr />
                                                         <div className='container-sm  p-2 my-2 rounded '>
                                                             <h6>Shipping Cost : <span className='float-right'>₹50</span></h6>
                                                             <h6>Discount : <span className='float-right'>₹0</span></h6>
                                                             <h5 className='align-self-center'>Total Amount Paid: <span className='float-right'
-                                                                style={{ color: "#f56042" }}>₹{total+50}</span></h5>
+                                                                style={{ color: "#f56042" }}>₹{total + 50}</span></h5>
                                                         </div>
                                                     </div>
                                                 </div>

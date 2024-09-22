@@ -1,6 +1,6 @@
 import store from "../store";
 import axios from "axios";
-import { addOrder_arr, emptyOrders, updateOrders } from "../reducers/ordersReduser";
+import { addOrder_arr, emptyOrders, updateOrders,updateordersatus } from "../reducers/ordersReduser";
 import { geturl } from "../../config/url";
 
 export const add_orders = async () => {
@@ -21,11 +21,11 @@ export const add_orders = async () => {
 export const empty_order = () => {
  store.dispatch(emptyOrders());
 }
-export const update_order = async(item,cancleReason) => {
+export const update_order = async(item,cancleReason,admin) => {
     try {
         const config = { headers: { authToken: localStorage.getItem('token') } }
         const newurl = geturl("/orders/cancleorder");
-        await axios.post(newurl,{order_id:item.order_id,cancleReason},config).then((res) => {
+        await axios.post(newurl,{order_id:item.order_id,cancleReason,admin_id:admin?true:false},config).then((res) => {
             if (res.data.status === 200) {
                 store.dispatch(updateOrders(item));
             } else {
@@ -50,5 +50,20 @@ export const admin_add_orders=async()=>{
         });
     } catch (error) {
         console.log("there is an error to feching a data");
+    }
+}
+export const update_order_status=async(item,value)=>{
+    try {
+        const config = { headers: { authToken: localStorage.getItem('token') } }
+        const newurl = geturl("/orders/setorderstatus");
+        await axios.post(newurl,{order_id:item.order_id,status:value},config).then((res) => {
+            if (res.data.status === 200) {
+                store.dispatch(updateordersatus({item,status:value}));
+            } else {
+                console.log(res);
+            }
+        });
+    } catch (error) {
+        console.log("there is an error to update status of order")
     }
 }
